@@ -3,38 +3,38 @@
 *
 * Author: OCDT Syed & OCDT Tchameni Moko
 *
-* Description: 
+* Description:
   The program processes a long string stored in read-only memory.
- It counts the number of capital letters using a loop that compares each character to ASCII values. 
- It copies the original string into another memory area. After copying, it converts all lowercase letters to uppercase using ASCII arithmetic. 
- These tasks are done through three subroutines: CapCount, Copy, and Convert. 
+ It counts the number of capital letters using a loop that compares each character to ASCII values.
+ It copies the original string into another memory area. After copying, it converts all lowercase letters to uppercase using ASCII arithmetic.
+ These tasks are done through three subroutines: CapCount, Copy, and Convert.
  The result is stored in different memory sections and can be inspected during debugging.
 
 *
 * Revision History:
-********************************************************************************/ 
+********************************************************************************/
 
         .syntax unified
         .global _start
         .thumb_func
-        
+
 /********EQUATES****************************************************************/
         .equ    CapA, 0x41 //'A'
         .equ    CapZ, 0x5A //'Z'
         .equ    MinA, 0x61 //'a'
         .equ    MinZ, 0x7A //'z'
-        
+
 /*******Global Constants********************************************************/
-        .section .rodata       
-PBText:         
+        .section .rodata
+PBText:
     .ascii "Prince Humperdinck dove for his weapons, and a sword flashed in his thick hands."
 	.ascii "To the death, he said, advancing."
 	.ascii "Westley gave a soft shake of his head. No, he corrected. To the pain."
 	.ascii "It was an odd phrase, and for the moment it brought the Prince up short."
 	.ascii "I don't think I quite understand that."
-	.ascii "I'm going to tell you something once and then whether you die is strictly up to you," 
+	.ascii "I'm going to tell you something once and then whether you die is strictly up to you,"
 	.ascii "Westley said, lying pleasantly on the bed."
-	.ascii "What I'm going to tell you is this: drop your sword, and if you do, then I will leave" 
+	.ascii "What I'm going to tell you is this: drop your sword, and if you do, then I will leave"
 	.ascii "with this baggage here -he glanced at Buttercup-"
 	.ascii "and you will be tied up but not fatally, and will be free to go about your business."
 	.ascii "And if you choose to fight, well, then, we will not both leave alive."
@@ -55,7 +55,7 @@ PBText:
 	.ascii "there you know, you miserable vomitous mass, and I say this now, and live or die,"
 	.ascii "it's up to you: Drop your sword!"
 	.asciz "The sword crashed to the floor."
-PBTextEnd: 
+PBTextEnd:
 
 
 /*******Global Variables*******************************************************/
@@ -71,17 +71,17 @@ CapitalString:
   .space (PBTextEnd-PBText)
 CapitalStringEnd:
 /*******Code Section***********************************************************/
-        .text             
-                         
+        .text
+
 _start:
-  
+
         /*
-        
+
           CapCount Demo
 
           Answer in NumCap
-        
-        */   
+
+        */
         LDR r1,=PBText
         LDR r2,=PBTextEnd
         LDR r3,=NumCap
@@ -89,21 +89,21 @@ _start:
 
 
         /*
-        
+
           Copy Demo
 
           Answer in CloneString -> CloneStringEnd
-        
-        */   
+
+        */
         LDR r0,=PBText
         LDR r1,=PBTextEnd
         LDR r2,=CloneString
         LDR r3,=CloneStringEnd
         BL Copy
-  
+
 
        /*
-        
+
           Convert Demo
 
           Converted String in CapitalString -> CapitalStringEnd
@@ -133,15 +133,15 @@ _start:
 *
 * Description: Convert from lower case to upper case
 *
-* Notes:   R2 = Overwritten to hold characters 
+* Notes:   R2 = Overwritten to hold characters
 *
 * Inputs:  R0 = Start Address, R1 = End Address
 * Outputs: None
-********************************************************************************/ 
+********************************************************************************/
 Convert:
 1:
         LDRB r2, [r0]
-  
+
         // 'a' <= x < 'z'
         CMP r2, MinA-1 // BLS is LOWER & EQUAL TO
         BLS 2f
@@ -149,7 +149,7 @@ Convert:
         BHI 2f
         SUB r2, MinA-CapA
 
-2:      
+2:
         STRB r2, [r0], 1
         //start != end, goto loop
         CMP r0,r1
@@ -165,10 +165,10 @@ Convert:
 * Notes:    R4 = Overwritten to hold Characters
 *           Copying ends as soon as one of the end addresses is reached IOT protect data.
 *
-* Inputs:   R0 = Source Start Address, R1 = Source End Address, 
+* Inputs:   R0 = Source Start Address, R1 = Source End Address,
 *           R2 = Destination Start Address, R3 = Destination End Address
 * Outputs:  None
-********************************************************************************/ 
+********************************************************************************/
 Copy:
 1:
         // destination start > end then stop
@@ -194,11 +194,11 @@ Copy:
             R4 = Overwritten to hold the count of capital letters
 *
 * Inputs:   R1 = Start Address, R2 = End Address, R3 = Result Address (4 bytes)
-********************************************************************************/ 
-CapCount:        
+********************************************************************************/
+CapCount:
 1:
         LDRB r0, [r1], 1
-  
+
         // 'A' <= x < 'Z'
         CMP r0, CapA-1 // BLS is LOWER & EQUAL TO
         BLS 2f
